@@ -29,8 +29,6 @@ export function Phonebook({onSubmit}){
 
 
   const handleChange = (event) => {
-    console.log(event)
-
     if(event.currentTarget.name === "name"){
       setName(event.currentTarget.value)
     } else
@@ -39,7 +37,6 @@ export function Phonebook({onSubmit}){
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    console.log(event);
     onSubmit({name, number});
     setName("")
     setNumber("")

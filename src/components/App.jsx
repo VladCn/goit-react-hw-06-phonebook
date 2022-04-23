@@ -3,20 +3,23 @@ import { ContactList } from "./ContactList";
 import { Phonebook } from "./Phonebook";
 import { ContactRender } from "./ContactRender";
 import shortid from "shortid";
-import { loadFromLocalStorage, saveToLocalStorage } from "utils";
+import { useSelector, useDispatch } from 'react-redux'
+import { add, remove } from "../Redux/contactSlice";
 
-const KEY = "contacts"
+
 
 export function App() {
+  const dispatch = useDispatch()
+  //используем для вывода информации из стейта
+  const persistedContacts = useSelector(state => state.contacts.value)
+
   const [contacts, setContacts] = useState([])
   const [filter, setFilter] = useState("")
   const [filteredContacts, setFilteredContacts] = useState([])
 
 useEffect(() => {
-  const localArray = loadFromLocalStorage(KEY);
-
-  setContacts(localArray);
-},[])
+  setContacts(persistedContacts);
+},[persistedContacts])
 
   useEffect(() => {
     const filteredContacts = contacts?.filter((item) => {
@@ -26,10 +29,9 @@ useEffect(() => {
   },[contacts, filter])
 
   const handleDelete = (event) => {
-    console.log(event.target.value);
-    const newContacts = contacts.filter((value) => value.id !== event.target.value)
-    setContacts(newContacts)
-    saveToLocalStorage(KEY, newContacts)
+    dispatch(remove(event.target.value))
+    // setContacts(newContacts)
+    // saveToLocalStorage(KEY, newContacts)
   };
 
   const handleFilterContact = (event) => {
@@ -37,25 +39,17 @@ useEffect(() => {
     setFilter(event.target.value)
   };
 
-  const handleSubmit = (data) => {
+  const handleSubmit = ({ name, number }) => {
+    //
+
     const res = contacts.map((item) => {
       return item.name;
     });
 
-    if (res.includes(data.name)) {
-      return alert(`${data.name} is already in contacts`);
+    if (res.includes(name)) {
+      return alert(`${name} is already in contacts`);
     } else {
-      const newContacts = [
-        ...contacts,
-        {
-          name: data.name,
-          number: data.number,
-          id: shortid.generate(),
-        },
-      ];
-      setContacts(newContacts);
-      console.log(newContacts)
-      saveToLocalStorage(KEY, newContacts)
+      dispatch(add({name, number, id: shortid.generate()}))
     }
 
 }
