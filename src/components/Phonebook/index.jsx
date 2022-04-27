@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
 import styled from "styled-components";
+import { add } from "redux/contactSlice";
+import shortid from "shortid";
+import { useDispatch, useSelector } from "react-redux";
 
 const Form = styled.form`
   display: flex;
@@ -22,11 +25,11 @@ const Button = styled.button`
   width: 100px;
 `;
 
-export function Phonebook({onSubmit}){
-
+export function Phonebook(){
+  const dispatch = useDispatch()
+  const persistedContacts = useSelector(state => state.contacts.value)
   const[name, setName] = useState("")
   const[number, setNumber] = useState("")
-
 
   const handleChange = (event) => {
     if(event.currentTarget.name === "name"){
@@ -35,9 +38,21 @@ export function Phonebook({onSubmit}){
     setNumber(event.currentTarget.value)
   };
 
+  const handleSaveContacts = ({ name, number }) => {
+    const res = persistedContacts.map((item) => {
+      return item.name;
+    });
+
+    if (res.includes(name)) {
+      return alert(`${name} is already in contacts`);
+    } else {
+      dispatch(add({name, number, id: shortid.generate()}))
+    }
+  }
+
   const handleSubmit = (event) => {
     event.preventDefault();
-    onSubmit({name, number});
+    handleSaveContacts({name, number});
     setName("")
     setNumber("")
   };
